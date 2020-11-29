@@ -110,7 +110,6 @@ public class JavaHTTPServer implements Runnable{
                 // GET or HEAD method and special request 
                 if(fileRequested.equals("/" + FILE_XML)){
                     obj = new ObjectMapper();
-                    obj.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
                     ArrayList<PuntoVendita> pv = obj.readValue(new File(WEB_ROOT + "/" + FILE_JSON), new TypeReference<ArrayList<PuntoVendita>>(){}); // deserialize from json
                     
                     xml = new XmlMapper();
