@@ -78,8 +78,6 @@ public class JavaHTTPServer implements Runnable{
             String method = parse.nextToken().toUpperCase(); // we get the HTTP method of the client
             // we get file requested
             fileRequested = parse.nextToken().toLowerCase();
-            // fix unknow error
-            if(fileRequested.equals("/puntivendita.xml/")) fileRequested = "/puntivendita.xml";
 
             // check for supported method
             if (!method.equals("GET")  &&  !method.equals("HEAD")) {
