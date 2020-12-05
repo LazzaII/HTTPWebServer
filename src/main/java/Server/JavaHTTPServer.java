@@ -18,8 +18,8 @@ public class JavaHTTPServer implements Runnable{
     static final String FILE_REDIRECT = "301.html";
     static final String FILE_JSON = "puntiVendita.json";
     static final String FILE_XML = "puntivendita.xml";
-    static final String XML_DATABASE = "xml";
-    static final String JSON_DATABASE = "json";
+    static final String XML_REQUEST = "file.xml";
+    static final String JSON_REQUEST = "file.json";
     
     // port to listen connection
     static final int PORT = 8080;
@@ -31,11 +31,11 @@ public class JavaHTTPServer implements Runnable{
     private Socket connect;
 
     // var used for serialize and deserialize
-    ObjectMapper obj = new ObjectMapper();
+    ObjectMapper json = new ObjectMapper();
     XmlMapper xml = new XmlMapper();
     
     // create and connect to the database
-    // Database db = new Database();
+    Database db = new Database();
 
     public JavaHTTPServer(Socket c) {
             connect = c;
@@ -113,10 +113,9 @@ public class JavaHTTPServer implements Runnable{
             } else {
                 // GET or HEAD method and special request 
                 if(fileRequested.equals("/" + FILE_XML)){
-                    obj = new ObjectMapper();
-                    ArrayList<PuntoVendita> pv = obj.readValue(new File(WEB_ROOT + "/" + FILE_JSON), new TypeReference<ArrayList<PuntoVendita>>(){}); // deserialize from json
                     
-                    xml = new XmlMapper();
+                    ArrayList<PuntoVendita> pv = json.readValue(new File(WEB_ROOT + "/" + FILE_JSON), new TypeReference<ArrayList<PuntoVendita>>(){}); // deserialize from json
+                    
                     String xmlFile = xml.writeValueAsString(pv); // serialize to xml
                     byte[] fileData = xmlFile.getBytes();
                     
@@ -133,7 +132,44 @@ public class JavaHTTPServer implements Runnable{
                     dataOut.flush();
                     return;
 
-                }else if (fileRequested.endsWith("/")) {
+                } else if (fileRequested.equals("/" + JSON_REQUEST)){
+
+                    String jsonFile = json.writeValueAsString(db.getAlunni()); // serialize to json
+                    byte[] fileData = jsonFile.getBytes();
+                    
+                    // send HTTP Headers
+                    out.println("HTTP/1.1 200 OK");
+                    out.println("Server: Java HTTP Server from LazzaII : 1.0");
+                    out.println("Date: " + new Date());
+                    out.println("Content-type: " + getContentType(fileRequested));
+                    out.println("Content-length: " + jsonFile.length());
+                    out.println(); // blank line between headers and content, very important !
+                    out.flush(); // flush character output stream buffer
+
+                    dataOut.write(fileData, 0, jsonFile.length());
+                    dataOut.flush();
+                    return;
+                    
+                    
+                } else if(fileRequested.equals("/" + XML_REQUEST)){
+                    
+                    String xmlFile = xml.writeValueAsString(db.getAlunni()); // serialize to xml
+                    byte[] fileData = xmlFile.getBytes();
+                    
+                    // send HTTP Headers
+                    out.println("HTTP/1.1 200 OK");
+                    out.println("Server: Java HTTP Server from LazzaII : 1.0");
+                    out.println("Date: " + new Date());
+                    out.println("Content-type: " + getContentType(fileRequested));
+                    out.println("Content-length: " + xmlFile.length());
+                    out.println(); // blank line between headers and content, very important !
+                    out.flush(); // flush character output stream buffer
+
+                    dataOut.write(fileData, 0, xmlFile.length());
+                    dataOut.flush();
+                    return;
+                    
+                } else if (fileRequested.endsWith("/")) {
                     fileRequested += DEFAULT_FILE;
                 }
 

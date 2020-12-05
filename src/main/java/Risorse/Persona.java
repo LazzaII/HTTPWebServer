@@ -13,6 +13,7 @@ public class Persona {
         this.cognome = cognome;
     }
 
+    // Getter&Setter
     public String getNome() {
         return nome;
     }

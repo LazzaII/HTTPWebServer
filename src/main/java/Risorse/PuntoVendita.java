@@ -17,7 +17,6 @@ public class PuntoVendita {
     private boolean flagFisicoOnline;
     private int idEsercente;
     private String ragioneSociale;
-
     
     // constructor empty and not
     public PuntoVendita() {
