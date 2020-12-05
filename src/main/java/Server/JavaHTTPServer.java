@@ -1,7 +1,8 @@
-package httpwebserver;
+package Server;
 
+import Risorse.*;
+import Database.*;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import java.io.*;
@@ -17,6 +18,9 @@ public class JavaHTTPServer implements Runnable{
     static final String FILE_REDIRECT = "301.html";
     static final String FILE_JSON = "puntiVendita.json";
     static final String FILE_XML = "puntivendita.xml";
+    static final String XML_DATABASE = "xml";
+    static final String JSON_DATABASE = "json";
+    
     // port to listen connection
     static final int PORT = 8080;
 
@@ -29,7 +33,9 @@ public class JavaHTTPServer implements Runnable{
     // var used for serialize and deserialize
     ObjectMapper obj = new ObjectMapper();
     XmlMapper xml = new XmlMapper();
-
+    
+    // create and connect to the database
+    // Database db = new Database();
 
     public JavaHTTPServer(Socket c) {
             connect = c;

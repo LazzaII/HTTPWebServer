@@ -1,4 +1,4 @@
-package httpwebserver;
+package Risorse;
 
 public class PuntoVendita {
     
