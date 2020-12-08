@@ -114,22 +114,14 @@ public class JavaHTTPServer implements Runnable{
                 // GET or HEAD method and special request 
                 if(fileRequested.equals("/" + FILE_XML)){
                     
-                    ArrayList<PuntoVendita> pv = json.readValue(new File(WEB_ROOT + "/" + FILE_JSON), new TypeReference<ArrayList<PuntoVendita>>(){}); // deserialize from json
+                    // deserialize from json
+                    ArrayList<PuntoVendita> pv = json.readValue(new File(WEB_ROOT + "/" + FILE_JSON), new TypeReference<ArrayList<PuntoVendita>>(){}); 
                     
                     String xmlFile = xml.writeValueAsString(pv); // serialize to xml
                     byte[] fileData = xmlFile.getBytes();
                     
-                    // send HTTP Headers
-                    out.println("HTTP/1.1 200 OK");
-                    out.println("Server: Java HTTP Server from LazzaII : 1.0");
-                    out.println("Date: " + new Date());
-                    out.println("Content-type: " + getContentType(fileRequested));
-                    out.println("Content-length: " + xmlFile.length());
-                    out.println(); // blank line between headers and content, very important !
-                    out.flush(); // flush character output stream buffer
-
-                    dataOut.write(fileData, 0, xmlFile.length());
-                    dataOut.flush();
+                    fileFound(xmlFile, fileRequested, dataOut, fileData, out); // send output
+                    System.out.println("File puntivendita.xml returned");
                     return;
 
                 } else if (fileRequested.equals("/" + JSON_REQUEST)){
@@ -137,36 +129,17 @@ public class JavaHTTPServer implements Runnable{
                     String jsonFile = json.writeValueAsString(db.getAlunni()); // serialize to json
                     byte[] fileData = jsonFile.getBytes();
                     
-                    // send HTTP Headers
-                    out.println("HTTP/1.1 200 OK");
-                    out.println("Server: Java HTTP Server from LazzaII : 1.0");
-                    out.println("Date: " + new Date());
-                    out.println("Content-type: " + getContentType(fileRequested));
-                    out.println("Content-length: " + jsonFile.length());
-                    out.println(); // blank line between headers and content, very important !
-                    out.flush(); // flush character output stream buffer
-
-                    dataOut.write(fileData, 0, jsonFile.length());
-                    dataOut.flush();
-                    return;
-                    
+                    fileFound(jsonFile, fileRequested, dataOut, fileData, out); // send output
+                    System.out.println("File file.json returned");
+                    return;               
                     
                 } else if(fileRequested.equals("/" + XML_REQUEST)){
                     
                     String xmlFile = xml.writeValueAsString(db.getAlunni()); // serialize to xml
                     byte[] fileData = xmlFile.getBytes();
                     
-                    // send HTTP Headers
-                    out.println("HTTP/1.1 200 OK");
-                    out.println("Server: Java HTTP Server from LazzaII : 1.0");
-                    out.println("Date: " + new Date());
-                    out.println("Content-type: " + getContentType(fileRequested));
-                    out.println("Content-length: " + xmlFile.length());
-                    out.println(); // blank line between headers and content, very important !
-                    out.flush(); // flush character output stream buffer
-
-                    dataOut.write(fileData, 0, xmlFile.length());
-                    dataOut.flush();
+                    fileFound(xmlFile, fileRequested, dataOut, fileData, out); // send output
+                    System.out.println("File file.xml returned");
                     return;
                     
                 } else if (fileRequested.endsWith("/")) {
@@ -222,6 +195,7 @@ public class JavaHTTPServer implements Runnable{
         }
     }
 
+    // return file data
     private byte[] readFileData(File file, int fileLength) throws IOException {
             FileInputStream fileIn = null;
             byte[] fileData = new byte[fileLength];
@@ -242,10 +216,28 @@ public class JavaHTTPServer implements Runnable{
                 return "text/html";
             else if (fileRequested.endsWith(".xml"))
                 return "text/xml";
+            else if (fileRequested.endsWith(".json"))
+                return "text/json";
             else
                 return "text/plain";
     }
+    
+    // return the file and the header (FILE FOUND)
+    private void fileFound (String file, String fileRequested, BufferedOutputStream dataOut, byte[] fileData, PrintWriter out) throws IOException {
+	// send HTTP Headers
+	out.println("HTTP/1.1 200 OK");
+	out.println("Server: Java HTTP Server from LazzaII : 1.0");
+	out.println("Date: " + new Date());
+	out.println("Content-type: " + getContentType(fileRequested));
+	out.println("Content-length: " + file.length());
+	out.println(); // blank line between headers and content, very important !
+	out.flush(); // flush character output stream buffer
 
+	dataOut.write(fileData, 0, file.length());
+	dataOut.flush();
+    }
+
+    // return the file and th header (FILE NOT FOUND)
     private void fileNotFound(PrintWriter out, OutputStream dataOut, String fileRequested) throws IOException {
             File file;
             int fileLength;
