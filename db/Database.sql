@@ -13,7 +13,7 @@ VALUES
     ("Edoardo", "Croci"),
     ("Andrea", "Lotti"),
     ("Francesco", "Filippini"),
-    ("Niccolò", "Fappani"),
+    ("Niccolo", "Fappani"),
     ("Samuele", "Pagliarello"),
     ("Samuele", "Marrani"),
     ("Leonardo", "Romagnoli"),

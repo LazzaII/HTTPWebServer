@@ -11,7 +11,7 @@ import java.util.*;
 
 public class JavaHTTPServer implements Runnable{ 
 
-    static final File WEB_ROOT = new File("./file");
+    static final File WEB_ROOT = new File("/home/cabox/workspace/HTTPWebServer/file");
     static final String DEFAULT_FILE = "index.html";
     static final String FILE_NOT_FOUND = "404.html";
     static final String METHOD_NOT_SUPPORTED = "not_supported.html";
@@ -21,8 +21,8 @@ public class JavaHTTPServer implements Runnable{
     static final String XML_REQUEST = "file.xml";
     static final String JSON_REQUEST = "file.json";
     
-    // port to listen connection
-    static final int PORT = 8080;
+    // port and ip to listen connection
+    static final int PORT = 3000;
 
     // verbose mode
     static final boolean verbose = true;
@@ -137,9 +137,9 @@ public class JavaHTTPServer implements Runnable{
                     
                     String xmlFile = xml.writeValueAsString(db.getAlunni()); // serialize to xml
                     byte[] fileData = xmlFile.getBytes();
-                    
+                                  
                     fileFound(xmlFile, fileRequested, dataOut, fileData, out); // send output
-                    System.out.println("File file.xml returned");
+                    System.out.println("File file.xml returned");                 
                     return;
                     
                 } else if (fileRequested.endsWith("/")) {
@@ -224,17 +224,17 @@ public class JavaHTTPServer implements Runnable{
     
     // return the file and the header (FILE FOUND)
     private void fileFound (String file, String fileRequested, BufferedOutputStream dataOut, byte[] fileData, PrintWriter out) throws IOException {
-	// send HTTP Headers
-	out.println("HTTP/1.1 200 OK");
-	out.println("Server: Java HTTP Server from LazzaII : 1.0");
-	out.println("Date: " + new Date());
-	out.println("Content-type: " + getContentType(fileRequested));
-	out.println("Content-length: " + file.length());
-	out.println(); // blank line between headers and content, very important !
-	out.flush(); // flush character output stream buffer
+            // send HTTP Headers
+            out.println("HTTP/1.1 200 OK");
+            out.println("Server: Java HTTP Server from LazzaII : 1.0");
+            out.println("Date: " + new Date());
+            out.println("Content-type: " + getContentType(fileRequested));
+            out.println("Content-length: " + file.length());
+            out.println(); // blank line between headers and content, very important !
+            out.flush(); // flush character output stream buffer
 
-	dataOut.write(fileData, 0, file.length());
-	dataOut.flush();
+            dataOut.write(fileData, 0, file.length());
+            dataOut.flush();
     }
 
     // return the file and th header (FILE NOT FOUND)

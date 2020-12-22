@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public class Database {
     
     static final String DRIVER = "com.mysql.cj.jdbc.Driver";
-    static final String DATABASE = "jdbc:mysql://localhost:3306/Database_TPSIT?user=root&password=Lazzarelli&serverTimezone=Europe/Rome";
+    static final String DATABASE = "jdbc:mysql://localhost:3306/Database_TPSIT?user=root&password=lazzarelli&serverTimezone=Europe/Rome";
     static final String QUERY = "SELECT Alunni.* FROM Alunni";
 
     ArrayList<Persona> alunni = new ArrayList<>();
