@@ -11,7 +11,8 @@ import java.util.*;
 
 public class JavaHTTPServer implements Runnable{ 
 
-    static final File WEB_ROOT = new File("/home/cabox/workspace/HTTPWebServer/file");
+    //static final File WEB_ROOT = new File("/home/cabox/workspace/HTTPWebServer/file");
+    static final String WEB_ROOT = "/file";
     static final String DEFAULT_FILE = "index.html";
     static final String FILE_NOT_FOUND = "404.html";
     static final String METHOD_NOT_SUPPORTED = "not_supported.html";
@@ -91,12 +92,10 @@ public class JavaHTTPServer implements Runnable{
                         System.out.println("501 Not Implemented : " + method + " method.");
                 }
 
-                // we return the not supported file to the client
-                File file = new File(WEB_ROOT, METHOD_NOT_SUPPORTED);
-                int fileLength = (int) file.length();
                 String contentMimeType = "text/html";
                 //read content to return to client
-                byte[] fileData = readFileData(file, fileLength);
+                byte[] fileData = readFileData(WEB_ROOT + "/" + METHOD_NOT_SUPPORTED);
+                int fileLength = fileData.length;
 
                 // we send HTTP Headers with data to client
                 out.println("HTTP/1.1 501 Not Implemented");
@@ -115,7 +114,7 @@ public class JavaHTTPServer implements Runnable{
                 if(fileRequested.equals("/" + FILE_XML)){
                     
                     // deserialize from json
-                    ArrayList<PuntoVendita> pv = json.readValue(new File(WEB_ROOT + "/" + FILE_JSON), new TypeReference<ArrayList<PuntoVendita>>(){}); 
+                    ArrayList<PuntoVendita> pv = json.readValue(WEB_ROOT + "/"+ FILE_JSON, new TypeReference<ArrayList<PuntoVendita>>(){}); 
                     
                     String xmlFile = xml.writeValueAsString(pv); // serialize to xml
                     byte[] fileData = xmlFile.getBytes();
@@ -144,15 +143,14 @@ public class JavaHTTPServer implements Runnable{
                     
                 } else if (fileRequested.endsWith("/")) {
                     fileRequested += DEFAULT_FILE;
-                }
-
-                File file = new File(WEB_ROOT, fileRequested);
-                int fileLength = (int) file.length();
+                }    
+                
                 String content = getContentType(fileRequested);
 
                 if (method.equals("GET")) { // GET method so we return content
-                    byte[] fileData = readFileData(file, fileLength);
-
+                    byte[] fileData = readFileData(WEB_ROOT + fileRequested);
+                    int fileLength = fileData.length;
+   
                     // send HTTP Headers
                     out.println("HTTP/1.1 200 OK");
                     out.println("Server: Java HTTP Server from LazzaII : 1.0");
@@ -196,12 +194,15 @@ public class JavaHTTPServer implements Runnable{
     }
 
     // return file data
-    private byte[] readFileData(File file, int fileLength) throws IOException {
-            FileInputStream fileIn = null;
-            byte[] fileData = new byte[fileLength];
-
+    private byte[] readFileData(String filePath) throws IOException {
+            InputStream fileIn = null;
+            byte[] fileData = null;
+            
             try {
-                fileIn = new FileInputStream(file);
+                fileIn = getClass().getResourceAsStream(filePath);  
+                System.out.println(filePath);
+                System.out.println(fileIn);
+                fileData = new byte[fileIn.available()];
                 fileIn.read(fileData);
             } finally {
                 if (fileIn != null) fileIn.close();
@@ -239,16 +240,14 @@ public class JavaHTTPServer implements Runnable{
 
     // return the file and th header (FILE NOT FOUND)
     private void fileNotFound(PrintWriter out, OutputStream dataOut, String fileRequested) throws IOException {
-            File file;
             int fileLength;
             String content = "text/html";
             byte[] fileData;
 
             //File not found
-            if(fileRequested.endsWith(".html")){
-                file = new File(WEB_ROOT, FILE_NOT_FOUND);
-                fileLength = (int) file.length();
-                fileData = readFileData(file, fileLength);
+            if(fileRequested.endsWith(".html")){         
+                fileData = readFileData(WEB_ROOT + "/" + FILE_NOT_FOUND);
+                fileLength = fileData.length;
 
                 out.println("HTTP/1.1 404 File Not Found");
                 out.println("Server: Java HTTP Server from LazzaII : 1.0");
@@ -266,9 +265,8 @@ public class JavaHTTPServer implements Runnable{
                 }
             //File redicted
             }else {
-                file = new File(WEB_ROOT, FILE_REDIRECT);
-                fileLength = (int) file.length();
-                fileData = readFileData(file, fileLength);
+                fileData = readFileData(WEB_ROOT + "/" + FILE_REDIRECT);
+                fileLength = fileData.length;
 
                 out.println("HTTP/1.1 301 File Redirect");
                 out.println("Server: Java HTTP Server from LazzaII : 1.0");
